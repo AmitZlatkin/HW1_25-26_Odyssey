@@ -1,28 +1,58 @@
+//
+// Created by Amit Zlatkin on 20.9.2025
+//
 
-#pragma once
-
-#include <string>
-#include <fstream>
+#ifndef BLOCKCHAIN_H
+#define BLOCKCHAIN_H
 
 #include "Transaction.h"
 
-using std::string;
-using std::ifstream;
-using std::ofstream;
+#include <fstream>
+#include <string>
 
+typedef int (*updateFunction)(int);
 
-typedef unsigned int (*updateFunction)(unsigned int);
+/**
+ *
+ * This module defines a new type that represents a BlockChain
+ *
+ * The following functions are available:
+ *   BlockChainDestroy              - Deletes an existing BlockChain in the system
+ *   BlockChainTransform            - Update the values of each transaction in the BlockChain
+ *   BlockChainPrintInfo            - Prints the data of all transactions in the BlockChain
+ *   BlockChainAppendTransaction    - creates and appends a new transaction to the BlockChain
+ *   BlockChainGetSize              - returns the number of Blocks in the BlockChain
+ *   BlockChainPersonalBalance      - returns the balance of a given person, relative to a given BlockChain
+ *   BlockChainLoad                 - Reads the data from the file and creates a new block chain with it
+ *   BlockChainDump                 - Prints the data of all transactions in the BlockChain to a given file
+ *   BlockChainDumpHashed           - Prints the Hashed data of all transactions in the BlockChain to a given file
+ *   BlockChainVerifyFile           - verifies that the file contains correct Hashed messages of the given blockChain
+ *   BlockChainCompress             - Compresses the given block chain based on the transaction's data.
+*/
 
 
 /**
-*
+ *
+ * Block - Defining the a single Block in the BlockChain
+ *
+*/
+struct Block {
+    Transaction m_transaction;
+    std::string m_timestamp;
+    Block* m_prev;
+};
+
+
+/**
+ *
  * BlockChain - Defining the new BlockChain Type
  *
 */
 struct BlockChain {
-    // You may add any fields you believe are necessary
+    Block* m_tail;
+    Block* m_head;
+    int size;
 };
-
 
 /**
  * BlockChainGetSize - returns the number of Blocks in the BlockChain
@@ -42,7 +72,7 @@ int BlockChainGetSize(const BlockChain& blockChain);
  *
  * @return Balance of the person
 */
-int BlockChainPersonalBalance(const BlockChain& blockChain, const string& name);
+int BlockChainPersonalBalance(const BlockChain& blockChain, const std::string& name);
 
 
 /**
@@ -57,9 +87,9 @@ int BlockChainPersonalBalance(const BlockChain& blockChain, const string& name);
 void BlockChainAppendTransaction(
         BlockChain& blockChain,
         unsigned int value,
-        const string& sender,
-        const string& receiver,
-        const string& timestamp
+        const std::string& sender,
+        const std::string& receiver,
+        const std::string& timestamp
 );
 
 
@@ -73,19 +103,28 @@ void BlockChainAppendTransaction(
 void BlockChainAppendTransaction(
         BlockChain& blockChain,
         const Transaction& transaction,
-        const string& timestamp
+        const std::string& timestamp
 );
+
+
+/**
+ * BlockChainTransform - Update the values of each transaction in the BlockChain
+ *
+ * @param blockChain BlockChain to update
+ * @param function a pointer to a transform function
+*/
+void BlockChainTransform(BlockChain& blockChain, updateFunction function);
 
 
 /**
  * BlockChainLoad - Reads data from a file and creates a new block chain
  *
- * @param file Data file to read from
+ * @param file Data File to read from
  *
  * @return BlockChain created from the file
  *
 */
-BlockChain BlockChainLoad(ifstream& file);
+BlockChain BlockChainLoad(std::ifstream& file);
 
 
 /**
@@ -104,34 +143,32 @@ BlockChain BlockChainLoad(ifstream& file);
  * @param file File to print to
  *
 */
-void BlockChainDump(const BlockChain& blockChain, ofstream& file);
+void BlockChainDump(const BlockChain& blockChain, std::ofstream& file);
 
 
 
 /**
- * BlockChainDumpHashed - Prints the *hashed data* of all transactions in the BlockChain to a given file
+ * BlockChainDumpHashed - Prints the *Hashed data* of all transactions in the BlockChain to a given file
  *
  * Data will be printed in the following format:
- * <hashed message>
- * <hashed message>
- * ...
- * <hashed message>
+ * BlockChain Dump:
+ * <n>. <Hashed message>
  *
  * @param blockChain BlockChain to print
  * @param file File to print to
  *
 */
-void BlockChainDumpHashed(const BlockChain& blockChain, ofstream& file);
+void BlockChainDumpHashed(const BlockChain& blockChain, std::ofstream& file);
 
 
 /**
- * BlockChainVerifyFile - verifies that the file contains correct hashed messages of the given BlockChain
+ * BlockChainVerifyFile - verifies that the file contains correct Hashed messages of the given BlockChain
  *
  * Input file is expected to contain data in the following format:
- * <hashed message>
- * <hashed message>
+ * <Hashed message>
+ * <Hashed message>
  * ...
- * <hashed message>
+ * <Hashed message>
  *
  * @param blockChain BlockChain to verify
  * @param file File to read from
@@ -139,7 +176,6 @@ void BlockChainDumpHashed(const BlockChain& blockChain, ofstream& file);
  * @return true if the file is valid, false otherwise
 */
 bool BlockChainVerifyFile(const BlockChain& blockChain, std::ifstream& file);
-
 
 /**
  * BlockChainCompress - Compresses the given block chain based on the transaction's data.
@@ -150,10 +186,15 @@ bool BlockChainVerifyFile(const BlockChain& blockChain, std::ifstream& file);
 void BlockChainCompress(BlockChain& blockChain);
 
 
+
+/* not supplied */
+
 /**
- * BlockChainTransform - Update the values of each transaction in the BlockChain
+ * @function BlockChainDestroy
+ * @abstract Deallocates an existing BlockChain and all of its resources.
+ * @param blockChain - the BlockChain to be deallocated. If the argument is nullptr, nothing will be done
  *
- * @param blockChain BlockChain to update
- * @param function a pointer to a transform function
 */
-void BlockChainTransform(BlockChain& blockChain, updateFunction function);
+void BlockChainDestroy(BlockChain& blockChain);
+
+#endif //BLOCKCHAIN_H
