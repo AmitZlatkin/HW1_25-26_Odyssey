@@ -1,22 +1,22 @@
+//
+// Created by Amit Zlatkin on 20.9.2025
+//
 
-#pragma once
+#ifndef TRANSACTION_H
+#define TRANSACTION_H
 
-#include <string>
 #include <fstream>
-
-using std::string;
-using std::ofstream;
-
+#include <string>
 
 /**
-*
+ *
  * Transaction - Defining the new Transaction Type
  *
 */
 struct Transaction {
-    unsigned int value;
-    string sender;
-    string receiver;
+    unsigned int m_value;
+    std::string m_sender;
+    std::string m_receiver;
 };
 
 
@@ -30,17 +30,17 @@ struct Transaction {
  *
  * @param transaction Transaction to print
 */
-void TransactionDumpInfo(const Transaction& transaction, ofstream& file);
+void TransactionDumpInfo(const Transaction& transaction, std::ofstream& file);
 
 
 /**
- * TransactionHashMessage - Hashs the message of the transaction
+ * TransactionHashMessage - Hashes the message of the transaction
  *
  * @param transaction Transaction to hash
  *
  * @return The hashed message
 */
-string TransactionHashedMessage(const Transaction& transaction);
+std::string TransactionHashedMessage(const Transaction& transaction);
 
 
 /**
@@ -54,5 +54,7 @@ string TransactionHashedMessage(const Transaction& transaction);
 */
 bool TransactionVerifyHashedMessage(
         const Transaction& transaction,
-        string hashedMessage
+        std::string hashedMessage
 );
+
+#endif //TRANSACTION_H
